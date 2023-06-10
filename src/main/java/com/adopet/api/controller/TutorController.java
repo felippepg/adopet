@@ -1,14 +1,24 @@
 package com.adopet.api.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.adopet.api.dominio.tutores.DadosCadastroTutores;
+import com.adopet.api.dominio.tutores.DadosDetalhamentoTutores;
+import com.adopet.api.dominio.tutores.Tutor;
+import com.adopet.api.dominio.tutores.TutorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("tutores")
 public class TutorController {
+
+    @Autowired
+    TutorRepository tutorRepository;
+
     @PostMapping
-    public void cadastrarTutores() {
+    public ResponseEntity<DadosDetalhamentoTutores> cadastrarTutores(@RequestBody DadosCadastroTutores dados) {
+        var tutor = new Tutor(dados);
+        tutorRepository.save(tutor);
+        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor));
     }
 }

@@ -1,4 +1,4 @@
-package com.adopet.api.dominio;
+package com.adopet.api.dominio.tutores;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,11 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(of = "id")
-public class Tutor {
+public class Tutor{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nome;
-    @OneToOne
-    private Perfil perfil;
+    private String email;
+    private String senha;
+
+    public Tutor(DadosCadastroTutores dados) {
+        this.nome = dados.nome();
+        this.email = dados.email();
+        this.senha = dados.senha();
+    }
 }
