@@ -1,14 +1,13 @@
 package com.adopet.api.controller;
 
-import com.adopet.api.dominio.tutores.DadosCadastroTutores;
-import com.adopet.api.dominio.tutores.DadosDetalhamentoTutores;
-import com.adopet.api.dominio.tutores.Tutor;
-import com.adopet.api.dominio.tutores.TutorRepository;
+import com.adopet.api.dominio.tutores.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 @RestController
@@ -19,10 +18,12 @@ public class TutorController {
     TutorRepository tutorRepository;
 
     @PostMapping
-    public ResponseEntity<DadosDetalhamentoTutores> cadastrarTutores(@RequestBody @Valid DadosCadastroTutores dados) {
+    @Transactional
+    public ResponseEntity cadastrarTutores(@RequestBody @Valid DadosCadastroTutores dados, UriComponentsBuilder uriComponentsBuilder) {
         var tutor = new Tutor(dados);
         tutorRepository.save(tutor);
-        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor));
+        var uri = uriComponentsBuilder.path("tutores/{id}").buildAndExpand(tutor.getId()).toUri();
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoTutores(tutor));
     }
 
     @GetMapping
@@ -34,6 +35,27 @@ public class TutorController {
         } else {
             return ResponseEntity.ok(tutores.map(tutor -> new DadosDetalhamentoTutores(tutor)));
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosDetalhamentoTutores> buscarTutorPorId(@PathVariable Long id) {
+        var tutor = tutorRepository.getReferenceById(id);
+        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity deleterTutor(@PathVariable Long id) {
+        tutorRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity atualizar(@RequestBody DadosAtualizarTutor dados) {
+        var tutor = tutorRepository.getReferenceById(dados.id());
+        tutor.atualizar(dados);
+        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor));
     }
 
 }

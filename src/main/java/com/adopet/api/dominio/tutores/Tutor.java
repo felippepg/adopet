@@ -24,4 +24,13 @@ public class Tutor {
         this.email = dados.email();
         this.senha = dados.senha();
     }
+
+    public void atualizar(DadosAtualizarTutor dados) {
+        if(dados.nome() != null) {
+            this.nome = dados.nome();
+        }
+        if(dados.email() != null) {
+            this.email = dados.email();
+        }
+    }
 }
