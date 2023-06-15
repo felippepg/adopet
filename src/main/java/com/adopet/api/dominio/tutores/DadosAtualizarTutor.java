@@ -1,7 +1,7 @@
 package com.adopet.api.dominio.tutores;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public record DadosAtualizarTutor(@NotBlank Long id, String nome, String email) {
+public record DadosAtualizarTutor(@NotNull Long id, String nome, String email) {
 
 }

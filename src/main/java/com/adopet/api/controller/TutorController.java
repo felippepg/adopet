@@ -1,7 +1,10 @@
 package com.adopet.api.controller;
 
 import com.adopet.api.config.NotFoundException;
+import com.adopet.api.dominio.perfil.PerfilRepository;
 import com.adopet.api.dominio.tutores.*;
+import com.adopet.api.dominio.usuario.Usuario;
+import com.adopet.api.dominio.usuario.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -16,50 +19,59 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TutorController {
 
     @Autowired
-    TutorRepository tutorRepository;
+    UsuarioRepository usuarioRepository;
+
+    @Autowired
+    PerfilRepository perfilRepository;
 
     @PostMapping
     @Transactional
     public ResponseEntity cadastrarTutores(@RequestBody @Valid DadosCadastroTutores dados, UriComponentsBuilder uriComponentsBuilder) {
-        var tutor = new Tutor(dados);
-        tutorRepository.save(tutor);
-        var uri = uriComponentsBuilder.path("tutores/{id}").buildAndExpand(tutor.getId()).toUri();
-        return ResponseEntity.created(uri).body(new DadosDetalhamentoTutores(tutor));
+        var perfil = perfilRepository.getReferenceById(dados.id());
+        var usuario = new Usuario(dados, perfil);
+        usuarioRepository.save(usuario);
+        var uri = uriComponentsBuilder.path("tutores/{id}").buildAndExpand(usuario.getId()).toUri();
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoTutores(usuario));
     }
 
     @GetMapping
     public ResponseEntity buscarTodosTutores(Pageable pageable) {
-        var tutores = tutorRepository.findAll(pageable);
+        var usuarios = usuarioRepository.findAllByTutor(pageable);
 
-        if(tutores.isEmpty()) {
+        //return ResponseEntity.ok(usuarios.map(DadosDetalhamentoTutores::new));
+
+        if(usuarios.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.ok(tutores.map(tutor -> new DadosDetalhamentoTutores(tutor)));
+            return ResponseEntity.ok(usuarios.map(usuario -> new DadosDetalhamentoTutores(usuario)));
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DadosDetalhamentoTutores> buscarTutorPorId(@PathVariable Long id) {
-        var tutor = tutorRepository.getReferenceById(id);
-        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor));
+        var usuario = usuarioRepository.findById(id);
+        if(usuario.isEmpty()) {
+            throw new NotFoundException("Tutor não encontrado");
+        }
+        return ResponseEntity.ok(new DadosDetalhamentoTutores(usuario.get()));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity deleterTutor(@PathVariable Long id) {
-        tutorRepository.deleteById(id);
+        usuarioRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity atualizar(@RequestBody  @Valid DadosAtualizarTutor dados) {
-        var tutor = tutorRepository.findById(dados.id());
-        if(tutor.isEmpty()) {
+        var usuario = usuarioRepository.findById(dados.id());
+        if(usuario.isEmpty()) {
             throw new NotFoundException("Tutor não encontrado");
         }
-        tutor.get().atualizar(dados);
-        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor.get()));
+        usuario.get().atualizar(dados);
+        return ResponseEntity.ok(new DadosDetalhamentoTutores(usuario.get()));
     }
 
 }
