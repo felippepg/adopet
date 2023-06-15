@@ -1,5 +1,6 @@
 package com.adopet.api.controller;
 
+import com.adopet.api.config.NotFoundException;
 import com.adopet.api.dominio.tutores.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,13 @@ public class TutorController {
 
     @PutMapping
     @Transactional
-    public ResponseEntity atualizar(@RequestBody DadosAtualizarTutor dados) {
-        var tutor = tutorRepository.getReferenceById(dados.id());
-        tutor.atualizar(dados);
-        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor));
+    public ResponseEntity atualizar(@RequestBody  @Valid DadosAtualizarTutor dados) {
+        var tutor = tutorRepository.findById(dados.id());
+        if(tutor.isEmpty()) {
+            throw new NotFoundException("Tutor não encontrado");
+        }
+        tutor.get().atualizar(dados);
+        return ResponseEntity.ok(new DadosDetalhamentoTutores(tutor.get()));
     }
 
 }
