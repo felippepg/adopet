@@ -1,10 +1,11 @@
-package com.adopet.api.dominio.tutores;
+package com.adopet.api.dominio.usuario;
 
+import com.adopet.api.dominio.endereco.DadosEndereco;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record DadosCadastroTutores(
+public record DadosCadastroUsuario(
         @NotBlank
         String nome,
         @NotBlank
@@ -13,11 +14,7 @@ public record DadosCadastroTutores(
         String senha,
         @NotNull
         @JsonAlias("perfil_id")
-        Long id
-
+        Long id,
+        DadosEndereco endereco
 ) {
 }
-
-
-
-

@@ -1,8 +1,6 @@
 package com.adopet.api.dominio.usuario;
 
 import com.adopet.api.dominio.perfil.Perfil;
-import com.adopet.api.dominio.tutores.DadosAtualizarTutor;
-import com.adopet.api.dominio.tutores.DadosCadastroTutores;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -25,14 +23,15 @@ public class Usuario {
     @OneToOne
     private Perfil perfil;
 
-    public Usuario(DadosCadastroTutores dados, Perfil perfil) {
+    public Usuario(DadosCadastroUsuario dados, Perfil perfil) {
         this.nome = dados.nome();
         this.email = dados.email();
         this.senha = dados.senha();
         this.perfil = perfil;
     }
 
-    public void atualizar(DadosAtualizarTutor dados) {
+
+    public void atualizar(DadosAtualizarUsuario dados) {
         if(dados.nome() != null) {
             this.nome = dados.nome();
         }

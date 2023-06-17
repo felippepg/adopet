@@ -3,6 +3,8 @@ package com.adopet.api.controller;
 import com.adopet.api.config.NotFoundException;
 import com.adopet.api.dominio.perfil.PerfilRepository;
 import com.adopet.api.dominio.tutores.*;
+import com.adopet.api.dominio.usuario.DadosAtualizarUsuario;
+import com.adopet.api.dominio.usuario.DadosCadastroUsuario;
 import com.adopet.api.dominio.usuario.Usuario;
 import com.adopet.api.dominio.usuario.UsuarioRepository;
 import jakarta.validation.Valid;
@@ -26,7 +28,7 @@ public class TutorController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity cadastrarTutores(@RequestBody @Valid DadosCadastroTutores dados, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity cadastrarTutores(@RequestBody @Valid DadosCadastroUsuario dados, UriComponentsBuilder uriComponentsBuilder) {
         var perfil = perfilRepository.getReferenceById(dados.id());
         var usuario = new Usuario(dados, perfil);
         usuarioRepository.save(usuario);
@@ -37,8 +39,6 @@ public class TutorController {
     @GetMapping
     public ResponseEntity buscarTodosTutores(Pageable pageable) {
         var usuarios = usuarioRepository.findAllByTutor(pageable);
-
-        //return ResponseEntity.ok(usuarios.map(DadosDetalhamentoTutores::new));
 
         if(usuarios.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -65,7 +65,7 @@ public class TutorController {
 
     @PutMapping
     @Transactional
-    public ResponseEntity atualizar(@RequestBody  @Valid DadosAtualizarTutor dados) {
+    public ResponseEntity atualizar(@RequestBody  @Valid DadosAtualizarUsuario dados) {
         var usuario = usuarioRepository.findById(dados.id());
         if(usuario.isEmpty()) {
             throw new NotFoundException("Tutor não encontrado");
