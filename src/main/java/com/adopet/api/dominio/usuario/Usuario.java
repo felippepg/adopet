@@ -1,17 +1,18 @@
-package com.adopet.api.dominio.tutores;
+package com.adopet.api.dominio.usuario;
 
+import com.adopet.api.dominio.perfil.Perfil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-@Entity(name = "Tutor")
-@Table(name = "tutores")
+@Entity(name = "Usuario")
+@Table(name = "usuario")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(of = "id")
-public class Tutor {
+public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -19,13 +20,18 @@ public class Tutor {
     private String email;
     private String senha;
 
-    public Tutor(DadosCadastroTutores dados) {
+    @OneToOne
+    private Perfil perfil;
+
+    public Usuario(DadosCadastroUsuario dados, Perfil perfil) {
         this.nome = dados.nome();
         this.email = dados.email();
         this.senha = dados.senha();
+        this.perfil = perfil;
     }
 
-    public void atualizar(DadosAtualizarTutor dados) {
+
+    public void atualizar(DadosAtualizarUsuario dados) {
         if(dados.nome() != null) {
             this.nome = dados.nome();
         }
